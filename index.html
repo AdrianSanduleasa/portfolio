@@ -554,7 +554,7 @@
       <h2 class="section-heading">Get in touch</h2>
       <p class="section-intro">I respond within 24 hours and I'm upfront about timelines and costs from the first message.</p>
       <div class="contact-grid">
-        <form class="contact-form" action="https://formspree.io/f/mvzbezwo" method="POST">
+        <form class="contact-form" id="contact-form">
           <div class="field">
             <label for="name">Name</label>
             <input type="text" id="name" name="name" required>
@@ -568,6 +568,7 @@
             <textarea id="message" name="message" required></textarea>
           </div>
           <button type="submit" class="btn">Send message</button>
+          <p id="form-status" style="display:none; margin-top: 12px; font-size: 0.95rem;"></p>
         </form>
         <div class="contact-info">
           <p>Have a project in mind or just want to chat? Drop me a message and I'll get back to you within 24 hours.</p>
@@ -607,6 +608,42 @@
       link.addEventListener('click', () => {
         menu.classList.remove('open');
       });
+    });
+
+    // Contact form — submit via JS, show inline message
+    const form = document.getElementById('contact-form');
+    const status = document.getElementById('form-status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetch('https://formspree.io/f/mvzbezwo', {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          status.textContent = 'Message sent — I\'ll get back to you within 24 hours.';
+          status.style.color = '#4ade80';
+          status.style.display = 'block';
+          form.reset();
+        } else {
+          status.textContent = 'Something went wrong. Please try again or email me directly.';
+          status.style.color = '#f87171';
+          status.style.display = 'block';
+        }
+      } catch {
+        status.textContent = 'Something went wrong. Please try again or email me directly.';
+        status.style.color = '#f87171';
+        status.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Send message';
     });
   </script>
 
